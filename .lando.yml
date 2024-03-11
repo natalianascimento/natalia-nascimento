@@ -2,3 +2,14 @@ name: natalia-nascimento
 recipe: drupal10
 config:
   webroot: web
+  drush: 12
+services:
+  appserver:
+    build:
+      - composer install
+tooling:
+  drush:
+    cmd: drush --root=/app/docroot -l https://natalia-nascimento.lndo.site/
+    service: appserver
+    env:
+      DRUSH_OPTIONS_URI: "https://https://natalia-nascimento.lndo.site"
