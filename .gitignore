@@ -7,8 +7,9 @@
 !/web/sites/*/settings.lando.php
 
 # Ignore paths that contain user-generated content.
-sites/*/files
-sites/*/private
+/web/sites/*/files
+/web/sites/*/files/
+/web/sites/*/private
 sites/all/modules/custom/*.csv
 
 # Ignore IDE files
