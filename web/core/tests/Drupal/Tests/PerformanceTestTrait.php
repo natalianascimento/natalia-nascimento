@@ -318,7 +318,11 @@ trait PerformanceTestTrait {
       ResourceAttributes::DEPLOYMENT_ENVIRONMENT => 'local',
     ])));
 
-    $transport = (new OtlpHttpTransportFactory())->create($collector, 'application/x-protobuf');
+    $otel_collector_headers = getenv('OTEL_COLLECTOR_HEADERS') ?: [];
+    if ($otel_collector_headers) {
+      $otel_collector_headers = json_decode($otel_collector_headers, TRUE);
+    }
+    $transport = (new OtlpHttpTransportFactory())->create($collector, 'application/x-protobuf', $otel_collector_headers);
     $exporter = new SpanExporter($transport);
     $tracerProvider = new TracerProvider(new SimpleSpanProcessor($exporter), NULL, $resource);
     $tracer = $tracerProvider->getTracer('Drupal');
@@ -339,6 +343,20 @@ trait PerformanceTestTrait {
         ->setAttribute('http.url', $url)
         ->startSpan();
       $first_byte_span->end($response_wall_time);
+
+      $collection = \Drupal::keyValue('performance_test');
+      $performance_test_data = $collection->get('performance_test_data');
+      $query_events = $performance_test_data['database_events'] ?? [];
+      foreach ($query_events as $key => $event) {
+        // Use the first part of the database query for the span name.
+        $query_span = $tracer->spanBuilder(substr($event->queryString, 0, 64))
+          ->setStartTimestamp((int) ($event->startTime * $nanoseconds_per_second))
+          ->setAttribute('query.string', $event->queryString)
+          ->setAttribute('query.args', var_export($event->args, TRUE))
+          ->setAttribute('query.caller', var_export($event->caller, TRUE))
+          ->startSpan();
+        $query_span->end((int) ($event->time * $nanoseconds_per_second));
+      }
       $lcp_timestamp = NULL;
       $fcp_timestamp = NULL;
       $lcp_size = 0;
