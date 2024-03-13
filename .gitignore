@@ -11,6 +11,8 @@
 /web/sites/*/files/
 /web/sites/*/private
 sites/all/modules/custom/*.csv
+web/sites/default/files/*
+web/sites/default/files*
 
 # Ignore IDE files
 .idea/
