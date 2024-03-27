@@ -4,7 +4,7 @@ rsvplist.formdemo:
     _form: '\Drupal\rsvplist\Form\RSVPForm'
     _title: 'RSVP to this Event (demo)'
   requirements:
-    _permission: 'access content'
+    _permission: 'view rsvplist'
 
 rsvplist.example:
   path: '/rsvplist/example'
