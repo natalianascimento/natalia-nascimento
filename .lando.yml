@@ -7,6 +7,9 @@ services:
   appserver:
     build:
       - composer install
+  pma:
+    type: phpmyadmin:5.0
+    hosts: database
 tooling:
   drush:
     cmd: drush --root=/app/docroot -l https://natalia-nascimento.lndo.site/
